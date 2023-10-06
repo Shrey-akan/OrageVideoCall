@@ -1,0 +1,28 @@
+<p>video-chat works!</p>
+<!-- video-chat.component.html -->
+<div>
+  <h1>Orage Video Chat</h1>
+
+  <div class="entry-modal" #entryModal>
+    <p>Create or Join Meeting</p>
+    <input class="room-input" #roomInput placeholder="Enter Room ID">
+    <div>
+      <button (click)="createRoom()">Create Room</button>
+      <button (click)="joinRoom()">Join Room</button>
+    </div>
+  </div>
+
+  <div class="meet-area">
+    <!-- Remote Video Element-->
+    <video #remoteVideo></video>
+
+    <!-- Local Video Element-->
+    <video #localVideo muted autoplay></video>
+
+    <div class="meet-controls-bar">
+      <button (click)="startScreenShare()">Screen Share</button>
+    </div>
+  </div>
+</div>
+
+<p #notification class="notification" [hidden]="true"></p>

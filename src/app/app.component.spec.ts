@@ -14,16 +14,16 @@ describe('AppComponent', () => {
     expect(app).toBeTruthy();
   });
 
-  it(`should have as title 'videocall'`, () => {
+  it(`should have as title 'form-apply'`, () => {
     const fixture = TestBed.createComponent(AppComponent);
     const app = fixture.componentInstance;
-    expect(app.title).toEqual('videocall');
+    expect(app.title).toEqual('form-apply');
   });
 
   it('should render title', () => {
     const fixture = TestBed.createComponent(AppComponent);
     fixture.detectChanges();
     const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('.content span')?.textContent).toContain('videocall app is running!');
+    expect(compiled.querySelector('.content span')?.textContent).toContain('form-apply app is running!');
   });
 });
