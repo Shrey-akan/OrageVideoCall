@@ -1,8 +1,7 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
-declare var Peer: any;
-declare var navigator: any;
-declare var Peer: any;
-declare var navigator: any;
+import Peer from 'peerjs';
+
+
 @Component({
   selector: 'app-video-chat',
   templateUrl: './video-chat.component.html',
@@ -20,10 +19,9 @@ export class VideoChatComponent implements OnInit {
   room_id!: string;
   local_stream: MediaStream | undefined;
   screenStream: MediaStream | undefined;
-  peer: any = null;
+  peer: Peer | null = null; // Use Peer from the imported library
   currentPeer: any = null;
   screenSharing = false;
-
   constructor() {}
 
   ngOnInit() {
@@ -42,20 +40,24 @@ export class VideoChatComponent implements OnInit {
     this.peer.on('open', (id: any) => {
       console.log('Peer Connected with ID: ', id);
       this.hideModal();
-      navigator.getUserMedia?.({ video: true, audio: true }, (stream: MediaStream) => {
-        this.local_stream = stream;
-        this.setLocalStream(this.local_stream);
-      }, (err: any) => {
-        console.log(err);
-      });
+      navigator.mediaDevices.getUserMedia({ video: true, audio: true }) // Updated getUserMedia
+        .then((stream: MediaStream) => {
+          this.local_stream = stream;
+          this.setLocalStream(this.local_stream);
+        })
+        .catch((err: any) => {
+          console.log(err);
+        });
       this.notify('Waiting for peer to join.');
     });
     this.peer.on('call', (call: any) => {
-      call.answer(this.local_stream);
-      call.on('stream', (stream: MediaStream) => {
-        this.setRemoteStream(stream);
-      });
-      this.currentPeer = call;
+      if (this.local_stream) {
+        call.answer(this.local_stream);
+        call.on('stream', (stream: MediaStream) => {
+          this.setRemoteStream(stream);
+        });
+        this.currentPeer = call;
+      }
     });
   }
 
@@ -97,20 +99,23 @@ export class VideoChatComponent implements OnInit {
     this.peer = new Peer();
     this.peer.on('open', (id: string) => {
       console.log('Connected with Id: ' + id);
-      navigator.getUserMedia({ video: true, audio: true }, (stream: MediaStream) => {
-        this.local_stream = stream;
-        this.setLocalStream(this.local_stream);
-        this.notify('Joining peer');
-        const call = this.peer.call(this.room_id, stream);
-        call.on('stream', (stream: MediaStream) => {
-          this.setRemoteStream(stream);
+      navigator.mediaDevices.getUserMedia({ video: true, audio: true }) // Updated getUserMedia
+        .then((stream: MediaStream) => {
+          this.local_stream = stream;
+          this.setLocalStream(this.local_stream);
+          this.notify('Joining peer');
+          const call = this.peer!.call(this.room_id, stream); // Use non-null assertion here
+          call.on('stream', (stream: MediaStream) => {
+            this.setRemoteStream(stream);
+          });
+          this.currentPeer = call;
+        })
+        .catch((err: any) => {
+          console.log(err);
         });
-        this.currentPeer = call;
-      }, (err: any) => {
-        console.log(err);
-      });
     });
   }
+  
 
   startScreenShare() {
     if (this.screenSharing) {
